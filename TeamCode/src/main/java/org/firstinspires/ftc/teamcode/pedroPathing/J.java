@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -22,7 +23,8 @@ import java.util.List;
 public class J extends LinearOpMode {
 
     private DcMotor shooter;
-    private CRServo servoOne;
+    private CRServo intake;
+    private Servo stopper;
     private Limelight3A limelight;
 
     public void runOpMode() throws InterruptedException{
@@ -103,21 +105,27 @@ public class J extends LinearOpMode {
             backRight.setPower(backRightPower);
 
             if(gamepad1.leftBumperWasPressed())  {
-                servoOne.setPower(1);
+                intake.setPower(1);
             }
 
             if (gamepad1.left_trigger >= 1) {
-                servoOne.setPower(-1);
+                stopper.setPosition(-0.3);
+                intake.setPower(-1);
             }
 
             if (gamepad1.dpad_up) {
-                servoOne.setPower(0);
+                intake.setPower(0);
             }
 
             if(gamepad1.right_trigger >= 1) {
+                stopper.setPosition(-0.3);
+                sleep(10);
                 shooter.setPower(0);
             }
+
             if(gamepad1.right_bumper) {
+                stopper.setPosition(0.3);
+                sleep(20);
                 shooter.setPower(1);
             }
 
@@ -125,9 +133,10 @@ public class J extends LinearOpMode {
     }
 
     private void initHardware() {
-        initServo();
+        initintake();
         initShooter();
         initLimeLight();
+        initstopper();
     }
 
     private void initShooter() {
@@ -146,68 +155,17 @@ public class J extends LinearOpMode {
         limelight.start();
     }
 
-    private void initServo() {
-        servoOne=hardwareMap.get(CRServo.class,"intake");
-        servoOne.setPower(0);
+    private void initstopper() {
+        stopper = hardwareMap.get(Servo.class, "stopper");
+        stopper.setDirection(Servo.Direction.FORWARD);
+        stopper.setPosition(0.3);
     }
 
-    private void TeleOpControls(){
+    private void initintake() {
+        intake =hardwareMap.get(CRServo.class,"intake");
+        intake.setPower(0);
+    }
 
-        if(gamepad1.leftBumperWasPressed())  {
-            servoOne.setPower(1);
-        }
-
-        if (gamepad1.left_trigger >= 1) {
-            servoOne.setPower(-1);
-        }
-
-        if (gamepad1.dpad_up) {
-            servoOne.setPower(0);
-        }
-
-        if(gamepad1.right_bumper) {
-            LLResult result = limelight.getLatestResult();
-            if (result != null && result.isValid()) {
-                Pose3D botpose = result.getBotpose();
-
-                // Access fiducial results
-                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-                for (LLResultTypes.FiducialResult fr : fiducialResults)
-
-                    if (botpose != null) {
-                        double x = botpose.getPosition().x;
-                        double y = botpose.getPosition().y;
-                        double z = botpose.getPosition().z;
-
-                        if (z >= 2.3){
-                            shooter.setPower(0.5);
-                        }
-
-                        else {
-                            shooter.setPower(1);
-                        }
-
-
-
-
-                            telemetry.addData("MT1 Location", "(" + x + ", " + y + ", " + z + ")");
-                            telemetry.update();
-
-                    }
-            }
-        }
-
-
-        if(gamepad1.right_trigger >= 1) {
-            shooter.setPower(0);
-        }
-        if(gamepad1.x) {
-            shooter.setPower(1);
-        }
-
-
-
-}
     public void slotTelemetry(){
         telemetry.addLine("Left Bumper starts intake");
         telemetry.addLine("Left Trigger starts outtake");
@@ -215,7 +173,7 @@ public class J extends LinearOpMode {
         telemetry.addLine("Right Bumber starts shooter");
         telemetry.addLine("Right Trigger stops shooer");
         telemetry.addData("Shooter:", shooter.getPower());
-        telemetry.addData("Axon:", servoOne.getPower());
+        telemetry.addData("Axon:", intake.getPower());
         telemetry.update();
 
     }

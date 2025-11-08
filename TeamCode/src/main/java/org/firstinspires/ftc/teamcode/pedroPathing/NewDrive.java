@@ -161,8 +161,8 @@ public class NewDrive extends LinearOpMode {
                 for (LLResultTypes.FiducialResult fr : fiducialResults)
 
                     if (botpose != null) {
-                        double x = botpose.getPosition().x;
-                        double y = botpose.getPosition().y;
+                        double Tx = botpose.getPosition().x;
+                        double Ty = botpose.getPosition().y;
                         double z = botpose.getPosition().z;
 
                         if (z >= 2.3){
@@ -176,7 +176,7 @@ public class NewDrive extends LinearOpMode {
 
 
 
-                        telemetry.addData("MT1 Location", "(" + x + ", " + y + ", " + z + ")");
+                        telemetry.addData("MT1 Location", "(" + Tx + ", " + Ty + ", " + z + ")");
                         telemetry.update();
 
                     }
