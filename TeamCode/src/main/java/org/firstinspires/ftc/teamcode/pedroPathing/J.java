@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
-
-
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -21,34 +19,24 @@ import java.util.List;
 
 
 @TeleOp
-public class NewDrive extends LinearOpMode {
+public class J extends LinearOpMode {
 
     private DcMotor shooter;
-    private CRServo intake;
+    private CRServo servoOne;
     private Limelight3A limelight;
-    private IMU imu;
 
-
-    public void runOpMode()throws InterruptedException{
+    public void runOpMode() throws InterruptedException{
         initHardware();
         while (!isStarted()){
             slotTelemetry();
         }
         waitForStart();
         while (opModeIsActive()){
-            TeleOpControls();
             DriveTrain();
         }
 
 
     }
-
-    private void initHardware() {
-        initServo();
-        initShooter();
-        initLimeLight();
-    }
-
 
     public void DriveTrain () throws InterruptedException {
         // Declare our motors
@@ -113,7 +101,33 @@ public class NewDrive extends LinearOpMode {
             backLeft.setPower(backLeftPower);
             frontRight.setPower(frontRightPower);
             backRight.setPower(backRightPower);
+
+            if(gamepad1.leftBumperWasPressed())  {
+                servoOne.setPower(1);
+            }
+
+            if (gamepad1.left_trigger >= 1) {
+                servoOne.setPower(-1);
+            }
+
+            if (gamepad1.dpad_up) {
+                servoOne.setPower(0);
+            }
+
+            if(gamepad1.right_trigger >= 1) {
+                shooter.setPower(0);
+            }
+            if(gamepad1.right_bumper) {
+                shooter.setPower(1);
+            }
+
         }
+    }
+
+    private void initHardware() {
+        initServo();
+        initShooter();
+        initLimeLight();
     }
 
     private void initShooter() {
@@ -133,22 +147,22 @@ public class NewDrive extends LinearOpMode {
     }
 
     private void initServo() {
-        intake=hardwareMap.get(CRServo.class,"servoOne");
-        intake.setPower(0);
+        servoOne=hardwareMap.get(CRServo.class,"intake");
+        servoOne.setPower(0);
     }
 
     private void TeleOpControls(){
 
         if(gamepad1.leftBumperWasPressed())  {
-            intake.setPower(1);
+            servoOne.setPower(1);
         }
 
         if (gamepad1.left_trigger >= 1) {
-            intake.setPower(-1);
+            servoOne.setPower(-1);
         }
 
         if (gamepad1.dpad_up) {
-            intake.setPower(0);
+            servoOne.setPower(0);
         }
 
         if(gamepad1.right_bumper) {
@@ -176,8 +190,8 @@ public class NewDrive extends LinearOpMode {
 
 
 
-                        telemetry.addData("MT1 Location", "(" + x + ", " + y + ", " + z + ")");
-                        telemetry.update();
+                            telemetry.addData("MT1 Location", "(" + x + ", " + y + ", " + z + ")");
+                            telemetry.update();
 
                     }
             }
@@ -191,8 +205,9 @@ public class NewDrive extends LinearOpMode {
             shooter.setPower(1);
         }
 
-    }
 
+
+}
     public void slotTelemetry(){
         telemetry.addLine("Left Bumper starts intake");
         telemetry.addLine("Left Trigger starts outtake");
@@ -200,7 +215,7 @@ public class NewDrive extends LinearOpMode {
         telemetry.addLine("Right Bumber starts shooter");
         telemetry.addLine("Right Trigger stops shooer");
         telemetry.addData("Shooter:", shooter.getPower());
-        telemetry.addData("Axon:", intake.getPower());
+        telemetry.addData("Axon:", servoOne.getPower());
         telemetry.update();
 
     }
