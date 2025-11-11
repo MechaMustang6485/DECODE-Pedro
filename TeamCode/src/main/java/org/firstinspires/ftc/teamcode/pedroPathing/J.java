@@ -32,12 +32,6 @@ public class J extends LinearOpMode {
         while (!isStarted()){
             slotTelemetry();
         }
-        waitForStart();
-        while (opModeIsActive()){
-            DriveTrain();
-        }
-
-
     }
 
     public void DriveTrain () throws InterruptedException {

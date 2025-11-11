@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -25,7 +26,9 @@ public class NewDrive extends LinearOpMode {
 
     private DcMotor shooter;
     private CRServo intake;
+    private Servo arm;
     private Limelight3A limelight;
+    private Servo stopper;
     private IMU imu;
 
 
@@ -35,18 +38,17 @@ public class NewDrive extends LinearOpMode {
             slotTelemetry();
         }
         waitForStart();
-        while (opModeIsActive()){
-            TeleOpControls();
+        while(opModeIsActive()) {
             DriveTrain();
         }
-
-
     }
 
     private void initHardware() {
         initServo();
         initShooter();
         initLimeLight();
+        initarm();
+        initstopper();
     }
 
 
@@ -113,6 +115,8 @@ public class NewDrive extends LinearOpMode {
             backLeft.setPower(backLeftPower);
             frontRight.setPower(frontRightPower);
             backRight.setPower(backRightPower);
+
+            TeleOpControls();
         }
     }
 
@@ -125,6 +129,17 @@ public class NewDrive extends LinearOpMode {
         shooter.setDirection(DcMotorEx.Direction.REVERSE);
     }
 
+    private void initarm() {
+        arm = hardwareMap.get(Servo.class, "arm");
+        arm.setPosition(0.3);
+    }
+
+    private void initstopper() {
+        stopper = hardwareMap.get(Servo.class, "stopper");
+        stopper.setDirection(Servo.Direction.FORWARD);
+        stopper.setPosition(-0.3);
+    }
+
     public void initLimeLight(){
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(1);
@@ -133,7 +148,7 @@ public class NewDrive extends LinearOpMode {
     }
 
     private void initServo() {
-        intake=hardwareMap.get(CRServo.class,"servoOne");
+        intake=hardwareMap.get(CRServo.class,"intake");
         intake.setPower(0);
     }
 
@@ -144,12 +159,24 @@ public class NewDrive extends LinearOpMode {
         }
 
         if (gamepad1.left_trigger >= 1) {
+            stopper.setPosition(-0.3);
             intake.setPower(-1);
         }
 
         if (gamepad1.dpad_up) {
             intake.setPower(0);
         }
+
+        if(gamepad1.right_trigger >= 1) {
+            stopper.setPosition(-0.3);
+            sleep(10);
+            shooter.setPower(0);
+        }
+
+        if (gamepad1.dpadDownWasPressed()) {
+            arm.setPosition(0.2);
+        }
+
 
         if(gamepad1.right_bumper) {
             LLResult result = limelight.getLatestResult();
@@ -166,10 +193,14 @@ public class NewDrive extends LinearOpMode {
                         double z = botpose.getPosition().z;
 
                         if (z >= 2.3){
+                            stopper.setPosition(0.3);
+                            sleep(20);
                             shooter.setPower(0.5);
                         }
 
                         else {
+                            stopper.setPosition(0.3);
+                            sleep(20);
                             shooter.setPower(1);
                         }
 
@@ -181,14 +212,6 @@ public class NewDrive extends LinearOpMode {
 
                     }
             }
-        }
-
-
-        if(gamepad1.right_trigger >= 1) {
-            shooter.setPower(0);
-        }
-        if(gamepad1.x) {
-            shooter.setPower(1);
         }
 
     }

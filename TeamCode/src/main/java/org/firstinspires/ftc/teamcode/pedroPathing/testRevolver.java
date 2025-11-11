@@ -85,7 +85,7 @@ public class testRevolver extends LinearOpMode{
         initShooter();
 //        initTouch();
         initColorSensor();
-        //initLimeLight();
+        initLimeLight();
 
     }
 
@@ -126,7 +126,7 @@ public class testRevolver extends LinearOpMode{
 //    public void getTouchSensor(){
 //        touchVal=touch.isPressed();
 //    }
-/*
+
     public void initLimeLight(){
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(1);
@@ -135,7 +135,7 @@ public class testRevolver extends LinearOpMode{
     }
 
 
- */
+
     public void initColorSensor(){
         colorSens=hardwareMap.get(ColorSensor.class,"colorSensor");
     }
@@ -158,7 +158,7 @@ public class testRevolver extends LinearOpMode{
     }
 
     public void teleOpControls(){
-/*
+
         LLResult result = limelight.getLatestResult();
         if (result != null && result.isValid()) {
             Pose3D botpose = result.getBotpose();
@@ -169,8 +169,21 @@ public class testRevolver extends LinearOpMode{
                     double x = botpose.getPosition().x;
                     double y = botpose.getPosition().y;
                     double z = botpose.getPosition().z;
+                    int id = fr.getFiducialId();
 
+                    if(id == 23) {
+                        initSequenceA();
+                        telemetry.addData("Apriltag", "("+id+")");
+                    }
 
+                    if(id == 21) {
+                        initSequenceB();
+                        telemetry.addData("Apriltag", "("+id+")");
+                    }
+                    if(id == 22) {
+                        initSequenceC();
+                        telemetry.addData("Apriltag", "("+id+")");
+                    }
 
 
 
@@ -179,7 +192,7 @@ public class testRevolver extends LinearOpMode{
             }
         }
 
- */
+/*
         if(gamepad1.aWasPressed()){
             initSequenceA();
         }
@@ -189,6 +202,8 @@ public class testRevolver extends LinearOpMode{
         if(gamepad1.xWasPressed()){
             initSequenceC();
         }
+
+ */
 //        if (gamepad1.yWasPressed()){
 //            initEmpty();
 //        }
