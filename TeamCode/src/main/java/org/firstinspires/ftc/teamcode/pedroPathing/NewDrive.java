@@ -31,12 +31,13 @@ public class NewDrive extends LinearOpMode {
     private Servo stopper;
     private IMU imu;
 
+    private double armpos = 0.6;
+
 
     public void runOpMode()throws InterruptedException{
         initHardware();
         while (!isStarted()){
-            slotTelemetry();
-        }
+            slotTelemetry();        }
         waitForStart();
         while(opModeIsActive()) {
             DriveTrain();
@@ -131,7 +132,8 @@ public class NewDrive extends LinearOpMode {
 
     private void initarm() {
         arm = hardwareMap.get(Servo.class, "arm");
-        arm.setPosition(0.3);
+        arm.setDirection(Servo.Direction.FORWARD);
+        arm.setPosition(armpos);
     }
 
     private void initstopper() {
@@ -174,44 +176,22 @@ public class NewDrive extends LinearOpMode {
         }
 
         if (gamepad1.dpadDownWasPressed()) {
-            arm.setPosition(0.2);
+            arm.setPosition(0);
+        }
+
+        if (gamepad1.dpadLeftWasPressed()) {
+            arm.setPosition(armpos);
         }
 
 
         if(gamepad1.right_bumper) {
-            LLResult result = limelight.getLatestResult();
-            if (result != null && result.isValid()) {
-                Pose3D botpose = result.getBotpose();
+            stopper.setPosition(0.3);
+            sleep(20);
+            shooter.setPower(1);
+        }
 
-                // Access fiducial results
-                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-                for (LLResultTypes.FiducialResult fr : fiducialResults)
-
-                    if (botpose != null) {
-                        double Tx = botpose.getPosition().x;
-                        double Ty = botpose.getPosition().y;
-                        double z = botpose.getPosition().z;
-
-                        if (z >= 2.3){
-                            stopper.setPosition(0.3);
-                            sleep(20);
-                            shooter.setPower(0.5);
-                        }
-
-                        else {
-                            stopper.setPosition(0.3);
-                            sleep(20);
-                            shooter.setPower(1);
-                        }
-
-
-
-
-                        telemetry.addData("MT1 Location", "(" + Tx + ", " + Ty + ", " + z + ")");
-                        telemetry.update();
-
-                    }
-            }
+        if (gamepad1.dpadRightWasPressed()) {
+            stopper.setPosition(0.3);
         }
 
     }
